@@ -1,0 +1,13 @@
+*.o
+*.p
+*.d
+*.[opd]
+*~
+/Atmel_2.4.5_IPv6
+/Atmel_2.4.5_IPv6/Source/int_chB/*.[opd]
+/Atmel_2.4.5_IPv6/Source/int_media/*.[opd]
+/Atmel_2.4.5_IPv6/Source/int_misc/*.[opd]
+/Atmel_2.4.5_IPv6/Source/int_SIP/*.[opd]
+/release_voip
+/unniti1k
+/Debug/

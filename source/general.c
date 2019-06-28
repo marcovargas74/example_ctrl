@@ -9,7 +9,6 @@
 #include "defin.h"
 #include "general.h"
 #include <stdio.h>
-#include <unistd.h>
 #include <stdarg.h>
 #include <sched.h>
 #include <sys/resource.h>

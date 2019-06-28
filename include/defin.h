@@ -93,6 +93,7 @@
 #define   SHOW_FRM_TO_PABXCOMM              0    // Mostra Log de mensgens enviadas pelo socket PABXCOMM
 #define   SHOW_FRM_FROM_PABXCOMM            0    // Mostra mensagens recebidas do pabxcomm via socket
 
+#define SOCKET_LINUX    0
 
 //#define   IP_LOCAL_HOST                 "127.0.0.1"
 //#define   SIP_DEFAULT_PORT	        5060

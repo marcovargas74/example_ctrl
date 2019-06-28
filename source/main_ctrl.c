@@ -28,7 +28,7 @@
 #include "def_types.h"
 #include "main_ctrl.h"
 #include "general.h"
-//#include "app_comm.h"
+#include "app_comm.h"
 
 #define THIS_FILE   "main_ctrl.c"
 
@@ -69,18 +69,18 @@ int main(void)
 
 
   //=========================== INICIALIZAÇÃO DE COMUNICAÇÂO COM PABX ==================
-  app_syslog( LOG_NOTICE, "%s->%s(){ Carrega a thread de comunicacao com oPABXCOMM_socket\n",__THIS_FILE__ );
+  app_syslog( LOG_NOTICE, "%s->%s(){ Carrega a thread de comunicacao com o remoto_socket\n",__THIS_FILE__ );
 
 
-//  ret_thread = pthread_create(&App_ctrl.router_thread, NULL, &PABXCOMM_socket, NULL);
+  ret_thread = pthread_create(&App_ctrl.router_thread, NULL, &COMM_socket, NULL);
   if (ret_thread)
     {
       app_syslog(LOG_ERR,"%s->%s(){FATAL ERROR->pthread_create}<error>[%d]\n", __THIS_FILE__, ret_thread );
       return ERROR;       //Termina Aplicação
     }
 
-//   if( Aguarda_comunicacao_com_PABX() != SUCCESS)
-//     return ERROR;       //Termina Aplicação
+   if( Aguarda_comunicacao() != SUCCESS)
+     return ERROR;       //Termina Aplicação
 
 #if ICIP_MOD_DEBUG && EXECUTE_TDD
    //Executa TESTE
@@ -163,7 +163,7 @@ void CloseApp_ctrl(void)
  //return;
  #endif
 
- app_syslog(LOG_ALERT, "%s->%s()(PID=%d){++++++++++++ APPLICATION BLF - FINISH ++++++++++++}",__THIS_FILE__, (int)getpid () );
+ app_syslog(LOG_ALERT, "%s->%s()(PID=%d){++++++++++++ APPLICATION BLF - FINISH ++++++++++++}\n",__THIS_FILE__, (int)getpid () );
  sleep(2);
 // ClosePABXCOMM();
  LoggerClose();
@@ -173,7 +173,7 @@ void CloseApp_ctrl(void)
 
 void app_trata_seg_fault(int signum)
 {
-  syslog( LOG_EMERG,"%s->%s()<EMERGENCY>[!!!SEGMENT FAULT!!! Failure BLF_CTRL App]", THIS_FILE, __func__);
+  syslog( LOG_EMERG,"%s->%s()<EMERGENCY>[!!!SEGMENT FAULT!!! Failure BLF_CTRL App]\n", THIS_FILE, __func__);
   printLastFunc(__func__);
   //generate core dump
   sleep(1);
@@ -199,7 +199,7 @@ void app_trata_cond_urgent_socket(int signum)
 void app_trata_quit(int signum)
 {
   int tmp_pid = getpid();
-  syslog( LOG_EMERG,"%s->%s()[!!!QUIT!!! BLF_CTRL thread:%d = %d]", __THIS_FILE__ , tmp_pid , Pids_Threads.Pid_Main);
+  syslog( LOG_EMERG,"%s->%s()[!!!QUIT!!! BLF_CTRL thread:%d = %d]\n", __THIS_FILE__ , tmp_pid , Pids_Threads.Pid_Main);
   //generate core dump
   if (Pids_Threads.Pid_Main == tmp_pid )
       CloseApp_ctrl();

@@ -10,6 +10,7 @@
 #define __GENERAL_H_
 
 #include <sys/stat.h>
+#include <unistd.h>
 #include "defin.h"
 #include "app_msg.h"
 
