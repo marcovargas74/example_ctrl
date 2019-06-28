@@ -26,14 +26,15 @@
 #include <pthread.h>
 #include <syslog.h>
 #include "def_types.h"
-//#include "blf_ctrl.h"
+#include "main_ctrl.h"
+#include "general.h"
 //#include "app_comm.h"
 
-#define THIS_FILE   "example_ctrl.c"
+#define THIS_FILE   "main_ctrl.c"
 
 struct  app App_ctrl;
 BOOL LOOP_Main = TRUE;
-//Status_PID_VoIP Pids_Threads;        //NUmro dos Pids das thread usados no debbuger
+Status_PID_VoIP Pids_Threads;        //NUmro dos Pids das thread usados no debbuger
 
 
 /*
@@ -49,19 +50,15 @@ int main(void)
 //  uLong count_1MIN = 0; //Contador de minuto
   int ret_thread;
 
-
-	puts("!!!Hello World!!!"); /* prints !!!Hello World!!! */
-
-
- // boost_priority(THREAD_PRIO_MAIN);
+  boost_priority(THREAD_PRIO_MAIN);
   StartLogger();
-//  TrataComandosVindoDoLinux(&sig_app);
+  TrataComandosVindoDoLinux();
 
 
   // Seta opções default da Aplicação
   init_parm_app();
-  app_syslog( LOG_NOTICE, "%s->%s(){******APPLICATION BLF-STARTING*******}<version>[%s]",__THIS_FILE__, App_ctrl.version_software );
-#if 0
+  app_syslog( LOG_NOTICE, "%s->%s(){******APPLICATION BLF-STARTING*******}<version>[%s]\n", __THIS_FILE__, App_ctrl.version_software );
+
 
   Pids_Threads.Pid_Main = getpid();
 
@@ -72,31 +69,29 @@ int main(void)
 
 
   //=========================== INICIALIZAÇÃO DE COMUNICAÇÂO COM PABX ==================
-  app_syslog( LOG_NOTICE, "%s->%s(){ Carrega a thread de comunicacao com oPABXCOMM_socket",__THIS_FILE__ );
-  ret_thread = pthread_create(&App_ctrl.router_thread, NULL, &PABXCOMM_socket, NULL);
+  app_syslog( LOG_NOTICE, "%s->%s(){ Carrega a thread de comunicacao com oPABXCOMM_socket\n",__THIS_FILE__ );
+
+
+//  ret_thread = pthread_create(&App_ctrl.router_thread, NULL, &PABXCOMM_socket, NULL);
   if (ret_thread)
     {
-      app_syslog(LOG_ERR,"%s->%s(){FATAL ERROR->pthread_create}<error>[%d]", __THIS_FILE__, ret_thread );
+      app_syslog(LOG_ERR,"%s->%s(){FATAL ERROR->pthread_create}<error>[%d]\n", __THIS_FILE__, ret_thread );
       return ERROR;       //Termina Aplicação
     }
 
-   if( Aguarda_comunicacao_com_PABX() != SUCCESS)
-     return ERROR;       //Termina Aplicação
+//   if( Aguarda_comunicacao_com_PABX() != SUCCESS)
+//     return ERROR;       //Termina Aplicação
 
 #if ICIP_MOD_DEBUG && EXECUTE_TDD
    //Executa TESTE
     ExecutaTestesFinais();
 #endif
-    app_syslog(LOG_DEBUG,"%s->%s(){LOOP_MAIN!!!}", __THIS_FILE__ );
-    while (LOOP_Main)
+    app_syslog(LOG_DEBUG,"%s->%s(){LOOP_MAIN!!!}\n", __THIS_FILE__ );
+ /*   while (LOOP_Main)
        {
           //Executa Timer
           Executa_Timer_Control(&count_LOOP, &count_30s, &count_1MIN);
-       }
-     return SUCCESS;
-
-#endif 0
-
+       }*/
  	return EXIT_SUCCESS;
 
 }
@@ -115,10 +110,11 @@ void init_parm_app(void)
 // list_init(&App_ctrl.Tab_BLF_key);
 // App_ctrl.sizeKey=0;
 
-// App_ctrl.thread_count   = 1;
-// App_ctrl.kill_application = KILL_NOT;
-// snprintf(&App_ctrl.version_software, APP_MAX_NOME_VERSAO, "%s.%s.%s", _VER_SOFT, _REV_SOFT, _REL_SOFT);
-// app_syslog( LOG_INFO,"%s->%s()<status>[OK]", __THIS_FILE__ );
+ App_ctrl.thread_count   = 1;
+ App_ctrl.kill_application = KILL_NOT;
+ snprintf(App_ctrl.version_software, APP_MAX_NOME_VERSAO, "%s.%s.%s", _VER_SOFT, _REV_SOFT, _REL_SOFT);
+ app_syslog( LOG_INFO,"%s->%s()<status>[OK]\n", __THIS_FILE__ );
+
 
 }//void initAplic(void)
 
@@ -158,8 +154,9 @@ void Executa_Timer_Control(int *ptr_count_LOOP, byte *ptr_count_30s, uLong *ptr_
 
 }//Excuta_timer_control
 
+#endif //
 
-void CloseApp_blf_ctrl(void)
+void CloseApp_ctrl(void)
 {
  #if MOD_DEBUG
  app_syslog(LOG_ALERT, "%s->%s() Reboot line %d\n", __THIS_FILE__, __LINE__);
@@ -168,12 +165,11 @@ void CloseApp_blf_ctrl(void)
 
  app_syslog(LOG_ALERT, "%s->%s()(PID=%d){++++++++++++ APPLICATION BLF - FINISH ++++++++++++}",__THIS_FILE__, (int)getpid () );
  sleep(2);
- ClosePABXCOMM();
+// ClosePABXCOMM();
  LoggerClose();
  LOOP_Main = FALSE;
  exit(0);
 }
-
 
 void app_trata_seg_fault(int signum)
 {
@@ -181,7 +177,7 @@ void app_trata_seg_fault(int signum)
   printLastFunc(__func__);
   //generate core dump
   sleep(1);
-  CloseApp_blf_ctrl();
+  CloseApp_ctrl();
   //signal(signum, SIG_DFL);
   //kill(getpid(), signum);
 }
@@ -206,7 +202,7 @@ void app_trata_quit(int signum)
   syslog( LOG_EMERG,"%s->%s()[!!!QUIT!!! BLF_CTRL thread:%d = %d]", __THIS_FILE__ , tmp_pid , Pids_Threads.Pid_Main);
   //generate core dump
   if (Pids_Threads.Pid_Main == tmp_pid )
-      CloseApp_blf_ctrl();
+      CloseApp_ctrl();
 
   sleep(1);
   exit(0);
@@ -219,16 +215,9 @@ void app_trata_quit(int signum)
  * Quando receber o sinal SIGUSR1 executa a ação
  * determinada pela estrutura sig
  */
-void TrataComandosVindoDoLinux(struct sigaction* sig_app)
+void TrataComandosVindoDoLinux(void)
 {
-//  void icip_trata_seg_fault(int signum);
-
-  /* Vincula o handler com uma função */
-  sig_app->sa_handler = CloseApp_blf_ctrl;
   //Comando veio do LInux ou outra aplicacao
-  //User-defined signal 1 (POSIX).
-  sigaction(SIGUSR1, &sig_app, 0);
-
   //Caso A aplicacao ocorra algum segment FAULT Causado por um NULL
   signal(SIGSEGV, app_trata_seg_fault);
 
@@ -240,4 +229,3 @@ void TrataComandosVindoDoLinux(struct sigaction* sig_app)
 
 }
 
-#endif //0

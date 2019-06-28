@@ -13,8 +13,8 @@
  * 			0.0 (01/07/2009):
  ******************************************************************************************************/
 
-#ifndef _BLF_CONTROL_H
-#define	_BLF_CONTROL_H
+#ifndef _MAIN_CONTROL_H
+#define	_MAIN_CONTROL_H
 
 
 #define   TIME_EXEC_30SEC       2//  3000 para 10ms
@@ -25,8 +25,15 @@
 /*
  *  FUNCTION DECLARATION
  */
-void CloseApp_blf_ctrl(void);
+void CloseApp_ctrl(void);
 
+void TrataComandosVindoDoLinux(void);
  
+
+/*
+ * Função de Inicialização de diversas Variaveis
+ * Usadas na Aplicação
+ */
+void init_parm_app(void);
 
 #endif //_BLF_CONTROL_H

@@ -9,6 +9,7 @@
 #include "defin.h"
 #include "general.h"
 #include <stdio.h>
+#include <unistd.h>
 #include <stdarg.h>
 #include <sched.h>
 #include <sys/resource.h>
@@ -28,7 +29,6 @@ const char *NameFuncaoGlobal;
 
 #define _storage_func(args_x) NameArquivoGlobal = va_arg(args_x, char *); NameFuncaoGlobal = va_arg(args_x, char *) ;
 
-/*
 //Define Prioridade da Thread
 void boost_priority(int priority)
 {
@@ -43,7 +43,6 @@ void boost_priority(int priority)
   app_syslog( LOG_DEBUG, "%s->%s{NOVO PROCESSO}<_priority>[%d]<PID>[%d]", __THIS_FILE__, param.sched_priority, getpid() );
 
 }//void boost_priority(void)
-*/
 
 
 //============================= LOGGIN  ==================================
@@ -67,6 +66,9 @@ void StartLogger(void)
   syslog( LOG_INFO, "%s->%s():sys/Log  Iniciado ", __THIS_FILE__);
 }
 
+/*
+ *
+ */
 void LoggerClose(void)
 {
   app_syslog(LOG_INFO, "%s->%s(){APP_CTRL_FINISH}",__THIS_FILE__);
@@ -114,16 +116,22 @@ void mem_free(void *pt_var)
  pt_var = NULL;
 }
 
-//Quando Variavel for alocado pelo PJ não de deve dar free
-void unnit_close(void *pt_fd)
+
+/*
+ * funcao generica para fechar sockets
+ * /
+void app_close(int *pt_fd)
 {
- if (pt_fd == NULL)
-   return;
+ if (*pt_fd == 0)
+	 {
+		 app_syslog( LOG_NOTICE, "%s->%s(){<ptfd_NULL>[]\n", __THIS_FILE__);
+		 return;
+	 }
 
- close(pt_fd);
- pt_fd = NULL;
+ close(*pt_fd);
+ *pt_fd = 0;
 }
-
+*/
 /* Aplicar o Padrao enm todas as Mensagens de LOG
  * Sintaxe da Mensagem de LOG
  * (funcao)    = Entre parenteses: Nome Da Funcao
@@ -142,23 +150,25 @@ int app_syslog(int syslogpri, char *format, ...)
    return ECANCELLED;
 
   va_start(args, format);
+#if PRINT_SYSLOG
+  vprintf(format, args);
+#else
   vsyslog(syslogpri, format, args);
-  _storage_func(args);
+#endif
+//  _storage_func(args);
   va_end(args);
 
 
-#if !PRINT_SYSLOG
-  printf(format, args);
-#endif
+
 
   return SUCCESS;
 }
 
 
-void printLastFunc( char* name_func)
+void printLastFunc( const char* name_func)
 {
   syslog(LOG_EMERG, "%s->%s()<!!!The Last FILE was>[%s()]", name_func, name_func,  NameArquivoGlobal);
-  if ( *NameFuncaoGlobal==NULL )
+  if ( *NameFuncaoGlobal==0 )
      return;
 
   syslog(LOG_EMERG, "%s->%s()<!!!The Last FUNCTION Exec>[was %s()]", name_func, name_func, NameFuncaoGlobal);

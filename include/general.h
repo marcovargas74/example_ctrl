@@ -32,6 +32,9 @@
  */
 void boost_priority(int priority);
 
+//Inicia Login da aplicação
+void StartLogger(void);
+
 /*
  *
  */
@@ -61,6 +64,11 @@ void app_SetLogLevel(BOOL isProg, int level);
  *
  */
 int app_syslog(int syslogpri, char *format, ...);
+
+/*
+ *
+ */
+void printLastFunc( const char* name_func);
 
 /*
  * poe caracter de fim de string(\0) na posição do caracter passado como parametro

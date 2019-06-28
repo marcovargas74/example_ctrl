@@ -72,7 +72,7 @@ struct call
 typedef struct Tctrl_call_current
 {
 
-  //***!!!ATENÇÂO Sempre que incluir um novo comapo é necessario alterar o tamamnho do ICIP_MAX_DADOS_CHAMADA_SAINTE
+  // ***!!!ATENÇÂO Sempre que incluir um novo comapo é necessario alterar o tamamnho do ICIP_MAX_DADOS_CHAMADA_SAINTE
   enum RouteEth  InterfaceRoteamento;  //Interface de roteamento de saida  // DWORD InterfaceRoteamento;
  enum ICIPTypeCall_IP TypeCall_IP;         //Esse ENUM é do tamanhdo de 1 BYTE          //Tipo de chamamda IP TTrue se chamada for ponto a Ponto
  BOOL LerDados;                       //Tipo De Ring Da Chamada
@@ -135,7 +135,7 @@ typedef struct
   int   Count_OCP_Crit;      //Numero de vezes que o sistema entrou em Nivel Critico
   int   Count_OCP_Busy;      //Numero de vezes que o sistema ocupou todos os canais TDM
 } Status_TDM_Channel;
-
+*/
 
 /*
  *

@@ -37,6 +37,7 @@
 #define _REL_SOFT    "27"    //RELEASE Aplicação VOIP - DIA
 //#define _V_DBG_SOFT  "DBG"  //Versao da Aplicação ICIP Modo DEBUG
 
+#define PRINT_SYSLOG  1
 #if MOD_DEBUG
   #define LEVEL_LOG   3
 #else //MODO RELEASE
